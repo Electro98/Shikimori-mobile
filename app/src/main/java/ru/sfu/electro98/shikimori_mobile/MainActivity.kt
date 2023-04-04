@@ -207,9 +207,8 @@ fun BottomBar(navController: NavHostController) {
 }
 
 
-@Preview(showBackground = true)
 @Composable
-fun DefaultPreview() {
+fun DefaultPreview(content: @Composable() () -> Unit) {
     ShikimoriMobileTheme {
         ShikimoriMobileTheme {
             // A surface container using the 'background' color from the theme
@@ -219,10 +218,7 @@ fun DefaultPreview() {
                 bottomBar = { BottomBar(navController = navController) },
             ) { contentPadding ->
                 Column(modifier = Modifier.padding(contentPadding)) {
-//                    AnimeScreen(SampleData.one_piece())
-//                    FakeMapScreen()
-//                    NotImplementedScreen()
-                    AnimeList(SampleData.animes())
+                    content()
                 }
             }
         }

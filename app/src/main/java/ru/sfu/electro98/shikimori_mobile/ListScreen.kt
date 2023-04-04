@@ -8,36 +8,54 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 
 @Composable
 fun AnimeList(list: List<AnimeShort>) {
-    Column {
-        Header(title = "Watched")
-        Row(modifier = Modifier.padding(horizontal = 12.dp)) {
-            Text(
-                text = "#",
-                modifier = Modifier
-                    .fillMaxWidth(0.15f)
-                    .wrapContentWidth(Alignment.CenterHorizontally)
-                    .padding(start = 12.dp),
-                fontSize = 18.sp,
+    LazyColumn(modifier = Modifier.padding(horizontal = 12.dp)) {
+        item {
+            Header(
+                title = "Watched",
+                paddingValues = PaddingValues(horizontal = 0.dp, vertical = 4.dp),
             )
-            Text(text = "Name", modifier = Modifier.fillMaxWidth(0.8f), fontSize = 18.sp)
         }
-        Divider(modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 4.dp))
-        LazyColumn(modifier = Modifier.padding(horizontal = 12.dp)) {
-            itemsIndexed(list) { index, anime ->
-                Row(modifier = Modifier.padding(vertical = 3.dp)) {
-                    Text(text = "$index", modifier = Modifier
+        item {
+            Row {
+                Text(
+                    text = "#",
+                    modifier = Modifier
                         .fillMaxWidth(0.15f)
                         .wrapContentWidth(Alignment.CenterHorizontally)
-                        .padding(start = 12.dp))
-                    Text(text = anime.name, modifier = Modifier.fillMaxWidth(0.98f))
-                }
+                        .padding(start = 12.dp),
+                    fontSize = 18.sp,
+                )
+                Text(text = "Name", modifier = Modifier.fillMaxWidth(0.8f), fontSize = 18.sp)
             }
         }
+        item { Divider(modifier = Modifier.padding(bottom = 4.dp)) }
+
+        itemsIndexed(list) { index, anime ->
+            Row(modifier = Modifier.padding(vertical = 3.dp)) {
+                Text(
+                    text = "$index",
+                    modifier = Modifier
+                        .fillMaxWidth(0.15f)
+                        .wrapContentWidth(Alignment.CenterHorizontally)
+                        .padding(start = 12.dp),
+                )
+                Text(text = anime.name, modifier = Modifier.fillMaxWidth(0.98f))
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ListScreenPreview() {
+    DefaultPreview {
+        AnimeList(SampleData.animes())
     }
 }
