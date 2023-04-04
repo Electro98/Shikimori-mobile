@@ -1,5 +1,6 @@
 package ru.sfu.electro98.shikimori_mobile
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
@@ -37,10 +38,14 @@ fun Modifier.leftBorder(strokeWidth: Dp, color: Color) = composed(
 )
 
 @Composable
-fun Header(title: String) {
+fun Header(
+    title: String,
+    paddingValues: PaddingValues = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+) {
     Surface(
         modifier = Modifier
-            .padding(start = 16.dp, end = 12.dp, top = 4.dp, bottom = 4.dp)
+            .padding(start = 4.dp)
+            .padding(paddingValues)
             .fillMaxWidth()
             .leftBorder(4.dp, MaterialTheme.colors.primaryVariant),
         color = MaterialTheme.colors.primarySurface
