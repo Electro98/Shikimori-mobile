@@ -198,7 +198,8 @@ fun BottomBar(navController: NavHostController) {
                     Icon(
                         painter = painterResource(id = item.iconId),
                         contentDescription = null,
-                        modifier = Modifier.height(24.dp)
+                        modifier = Modifier
+                            .size(24.dp)
                     )
                 }
             )
@@ -207,8 +208,10 @@ fun BottomBar(navController: NavHostController) {
 }
 
 
+data class DefaultPreviewContext(val navController: NavHostController)
+
 @Composable
-fun DefaultPreview(content: @Composable() () -> Unit) {
+fun DefaultPreview(content: @Composable() DefaultPreviewContext.() -> Unit) {
     ShikimoriMobileTheme {
         ShikimoriMobileTheme {
             // A surface container using the 'background' color from the theme
@@ -218,9 +221,18 @@ fun DefaultPreview(content: @Composable() () -> Unit) {
                 bottomBar = { BottomBar(navController = navController) },
             ) { contentPadding ->
                 Column(modifier = Modifier.padding(contentPadding)) {
-                    content()
+                    content(DefaultPreviewContext(navController))
                 }
             }
         }
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun BarsPreview() {
+    DefaultPreview {
+        HomeScreen(navController = navController)
     }
 }
