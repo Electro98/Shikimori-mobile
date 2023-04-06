@@ -26,3 +26,15 @@ val DroppedButtonLine = Color(0xfffec3c4)
 val InactiveStarColor = Color(0xffcdcdcc)
 val MALActiveStarColor = Color(0xff4c86c8)
 val SHIKIActiveStarColor = Color(0xff455567)
+
+// Bars
+// Activity bars
+val ActivityBarS0 = Color(0xff4682b4)
+val ActivityBarS1 = Color(0xff6295bd)
+val ActivityBarS2 = Color(0xff79a9cf)
+val ActivityBarS3 = Color(0xff98c2e3)
+
+// Anime list bar
+val CompletedBar = Color(0xff4682b4)
+val NotCompletedBar = Color(0xff79a9cf) // planned + watching + on-hold
+val DroppedBar = Color(0xffaaaaaa)
