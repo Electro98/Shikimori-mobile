@@ -16,9 +16,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.smarttoolfactory.ratingbar.RatingBar
+import ru.sfu.electro98.shikimori_mobile.ui.theme.FormBordersColor
+import ru.sfu.electro98.shikimori_mobile.ui.theme.FormSurfaceColor
 
 
 @Composable
@@ -60,8 +63,8 @@ fun LastAnime(anime: AnimeLong) {
     Surface(
         modifier = Modifier
             .padding(12.dp)
-            .border(1.dp, color = MaterialTheme.colors.onSurface),
-        color = MaterialTheme.colors.surface,
+            .border(1.dp, color = FormSurfaceColor),
+        color = FormBordersColor,
     ) {
         Column(modifier = Modifier.padding(start = 6.dp, end = 6.dp, bottom = 6.dp)) {
             Text(
@@ -75,7 +78,7 @@ fun LastAnime(anime: AnimeLong) {
                     contentScale = ContentScale.FillWidth,
                     modifier = Modifier
                         .width(120.dp)
-                        .border(1.dp, color = MaterialTheme.colors.onSurface),
+                        .border(1.dp, color = FormBordersColor),
                 )
                 Column(modifier = Modifier.padding(horizontal = 4.dp)) {
                     Text(text = anime.name)
@@ -114,7 +117,7 @@ fun LastAnime(anime: AnimeLong) {
                 onValueChange = {},
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(1.dp, color = MaterialTheme.colors.onSurface),
+                    .border(1.dp, color = FormBordersColor),
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = MaterialTheme.colors.background,
                 ),
@@ -130,5 +133,13 @@ fun HomeScreen(navController: NavController) {
             ComingSoon(animes = SampleData.animes(), navController = navController)
             LastAnime(anime = SampleData.last_anime())
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenPreview() {
+    DefaultPreview {
+        HomeScreen(navController = navController)
     }
 }

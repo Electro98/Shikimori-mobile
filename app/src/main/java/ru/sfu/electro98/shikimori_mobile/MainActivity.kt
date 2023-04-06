@@ -36,22 +36,24 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            var navController = rememberNavController()
-            Scaffold(
-                topBar = { TopSearchBar() },
-                bottomBar = { BottomBar(navController = navController) },
-            ) { contentPadding ->
-                NavHost(
-                    navController = navController,
-                    startDestination = "home",
-                    modifier = Modifier.padding(contentPadding)
-                ) {
-                    composable("home") { HomeScreen(navController) }
-                    composable("anime") { AnimeScreen(anime = SampleData.one_piece()) }
-                    composable("map") { FakeMapScreen() }
-                    composable("list") { AnimeList(SampleData.animes()) }
-                    composable("settings") { NotImplementedScreen() }
-                    composable("profile") { NotImplementedScreen() }
+            ShikimoriMobileTheme {
+                val navController = rememberNavController()
+                Scaffold(
+                    topBar = { TopSearchBar() },
+                    bottomBar = { BottomBar(navController = navController) },
+                ) { contentPadding ->
+                    NavHost(
+                        navController = navController,
+                        startDestination = "home",
+                        modifier = Modifier.padding(contentPadding)
+                    ) {
+                        composable("home") { HomeScreen(navController) }
+                        composable("anime") { AnimeScreen(anime = SampleData.one_piece()) }
+                        composable("map") { FakeMapScreen() }
+                        composable("list") { AnimeList(SampleData.animes()) }
+                        composable("settings") { NotImplementedScreen() }
+                        composable("profile") { NotImplementedScreen() }
+                    }
                 }
             }
         }
@@ -213,16 +215,14 @@ data class DefaultPreviewContext(val navController: NavHostController)
 @Composable
 fun DefaultPreview(content: @Composable() DefaultPreviewContext.() -> Unit) {
     ShikimoriMobileTheme {
-        ShikimoriMobileTheme {
-            // A surface container using the 'background' color from the theme
-            val navController = rememberNavController()
-            Scaffold(
-                topBar = { TopSearchBar() },
-                bottomBar = { BottomBar(navController = navController) },
-            ) { contentPadding ->
-                Column(modifier = Modifier.padding(contentPadding)) {
-                    content(DefaultPreviewContext(navController))
-                }
+        // A surface container using the 'background' color from the theme
+        val navController = rememberNavController()
+        Scaffold(
+            topBar = { TopSearchBar() },
+            bottomBar = { BottomBar(navController = navController) },
+        ) { contentPadding ->
+            Column(modifier = Modifier.padding(contentPadding)) {
+                content(DefaultPreviewContext(navController))
             }
         }
     }
