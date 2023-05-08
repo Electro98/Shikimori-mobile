@@ -15,6 +15,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import ru.sfu.electro98.shikimori_mobile.entities.Anime
 
 
 @Composable
@@ -38,7 +41,7 @@ fun FakeVerticalRating() {
 
 
 @Composable
-fun AnimeScreen(anime: AnimeLong) {
+fun AnimeScreen(anime: Anime) {
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
         Column {
             // Anime poster + rating
@@ -49,13 +52,13 @@ fun AnimeScreen(anime: AnimeLong) {
                         modifier = Modifier.padding(vertical = 6.dp),
                         fontSize = 24.sp,
                     )
-                    Image(
-                        painter = BitmapPainter(anime.image),
+                    AsyncImage(
+                        model = urlToShiki(anime.image.original),
                         contentDescription = "Anime '${anime.name}' poster",
                         contentScale = ContentScale.FillWidth,
                         modifier = Modifier
                             .width(250.dp)
-                            .border(1.dp, color = MaterialTheme.colors.onSurface)
+                            .border(1.dp, color = MaterialTheme.colors.onSurface),
                     )
                 }
 
@@ -107,7 +110,7 @@ fun AnimeScreen(anime: AnimeLong) {
                 }
                 Row(modifier = Modifier.padding(vertical = 4.dp)) {
                     Text(text = "Episodes: ")
-                    Text(text = "${anime.episodes ?: '?'}/${anime.episodesAired}")
+                    Text(text = "${anime.episodes ?: '?'}/${anime.episodesTrulyAired}")
                 }
             }
         }
@@ -118,6 +121,6 @@ fun AnimeScreen(anime: AnimeLong) {
 @Composable
 fun AnimeScreenPreview() {
     DefaultPreview {
-        AnimeScreen(SampleData.one_piece())
+        AnimeScreen(SampleData.new_anime())
     }
 }
