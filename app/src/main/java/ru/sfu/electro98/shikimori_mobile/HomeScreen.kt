@@ -8,32 +8,45 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.smarttoolfactory.ratingbar.RatingBar
+import ru.sfu.electro98.shikimori_mobile.entities.AnimePreview
+import ru.sfu.electro98.shikimori_mobile.entities.AnimeStatus
+import ru.sfu.electro98.shikimori_mobile.repository.AnimeRepository
 import ru.sfu.electro98.shikimori_mobile.ui.theme.FormBordersColor
 import ru.sfu.electro98.shikimori_mobile.ui.theme.FormSurfaceColor
 
 
 @Composable
-fun AnimePreview(navController: NavController, anime: AnimeShort) {
+fun AnimePreview(navController: NavController, anime: AnimePreview) {
     Column(
         modifier = Modifier
             .padding(top = 2.dp, end = 16.dp)
             .width(120.dp)
-            .clickable { navController.navigate("anime") }
+            .clickable { navController.navigate("anime/${anime.id}") }
     ) {
-        Image(
-            painter = BitmapPainter(image = anime.image),
+        AsyncImage(
+//            model = urlToShiki(anime.image.preview),
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(urlToShiki(anime.image.preview))
+                .crossfade(true)
+                .build(),
+            placeholder = painterResource(id = R.drawable.missing_preview),
             contentDescription = "Anime '${anime.name}' preview picture",
             contentScale = ContentScale.FillWidth,
             modifier = Modifier
@@ -44,7 +57,7 @@ fun AnimePreview(navController: NavController, anime: AnimeShort) {
 }
 
 @Composable
-fun ComingSoon(navController: NavController, animes: List<AnimeShort>) {
+fun ComingSoon(navController: NavController, animes: List<AnimePreview>) {
     Column {
         Header("Coming soon")
         Spacer(modifier = Modifier.height(2.dp))
@@ -127,10 +140,16 @@ fun LastAnime(anime: AnimeLong) {
 }
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavController, rep: AnimeRepository) {
+    val onScreensAnime by rep.getAnimes(
+        limit = 7,
+        status = AnimeStatus.ongoing,
+        order = "popularity",
+    ).observeAsState()
+    val ongoings = onScreensAnime?: listOf()
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
         Column {
-            ComingSoon(animes = SampleData.animes(), navController = navController)
+            ComingSoon(animes = ongoings, navController = navController)
             LastAnime(anime = SampleData.last_anime())
         }
     }
@@ -140,6 +159,6 @@ fun HomeScreen(navController: NavController) {
 @Composable
 fun HomeScreenPreview() {
     DefaultPreview {
-        HomeScreen(navController = navController)
+//        HomeScreen(navController = navController)
     }
 }

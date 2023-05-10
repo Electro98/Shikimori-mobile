@@ -18,11 +18,18 @@ abstract class AnimeDatabase: RoomDatabase() {
             synchronized(this) {
                 var instance = INSTANCE
                 if (instance == null) {
-                    instance = Room.databaseBuilder(
+//                    instance = Room.databaseBuilder(
+//                        context.applicationContext,
+//                        AnimeDatabase::class.java,
+//                        "anime_database",
+//                    ).fallbackToDestructiveMigration()
+//                        .allowMainThreadQueries()
+//                        .build()
+                    instance = Room.inMemoryDatabaseBuilder(
                         context.applicationContext,
                         AnimeDatabase::class.java,
-                        "anime_database",
                     ).fallbackToDestructiveMigration()
+                        .allowMainThreadQueries()
                         .build()
                     INSTANCE = instance
                 }

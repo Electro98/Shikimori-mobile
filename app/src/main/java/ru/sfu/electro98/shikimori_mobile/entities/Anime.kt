@@ -23,8 +23,9 @@ data class Anime(
     val url: String,
     val kind: String,
     val score: Float,
-    val status: String,
+    val status: AnimeStatus,
     val episodes: Int,
+    @SerializedName("episodes_aired")
     @ColumnInfo(name = "episodes_aired")
     val episodesAired: Int,
     @SerializedName("aired_on")
@@ -88,7 +89,7 @@ data class Anime(
 ) {
     @get:Ignore
     val episodesTrulyAired: Int
-        get() = if (status == "released") episodes else episodesAired
+        get() = if (status == AnimeStatus.released) episodes else episodesAired
 }
 
 
@@ -99,3 +100,25 @@ data class AnimeImage(
     val x48: String,
 )
 
+
+enum class AnimeStatus { anons, ongoing, released }
+
+
+data class AnimePreview(
+    val id: Int,
+    val name: String,
+    @SerializedName("russian")
+    val russianName: String,
+    val image: AnimeImage,
+    val url: String,
+    val kind: String,
+    val score: Float,
+    val status: AnimeStatus,
+    val episodes: Int,
+    @SerializedName("episodes_aired")
+    val episodesAired: Int,
+    @SerializedName("aired_on")
+    val airedOn: String?, // TODO: redefine type
+    @SerializedName("released_on")
+    val releasedOn: String?, // TODO: redefine type
+)

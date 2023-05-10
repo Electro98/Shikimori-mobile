@@ -81,6 +81,11 @@ dependencies {
 
     // Gson
     implementation 'com.google.code.gson:gson:2.10.1'
+    // Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     // Images from url
     implementation "io.coil-kt:coil-compose:2.3.0"
+    //observeAsState()
+    implementation "androidx.compose.runtime:runtime-livedata:1.5.0-alpha03"
 }

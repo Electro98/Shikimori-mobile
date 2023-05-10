@@ -1,42 +1,58 @@
 package ru.sfu.electro98.shikimori_mobile
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
+import androidx.lifecycle.LiveData
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.google.gson.Gson
+import kotlinx.coroutines.runBlocking
+import ru.sfu.electro98.shikimori_mobile.database.AnimeDatabase
 import ru.sfu.electro98.shikimori_mobile.entities.Anime
+import ru.sfu.electro98.shikimori_mobile.repository.AnimeRepository
 import ru.sfu.electro98.shikimori_mobile.ui.theme.ShikimoriMobileTheme
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
 
 class MainActivity : ComponentActivity() {
+    init { instance = this }
+
+    companion object {
+        private var instance: MainActivity? = null
+        fun applicationContext() : Context {
+            return instance!!.applicationContext
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val rep = AnimeRepository(AnimeDatabase.getInstance(applicationContext).animeDao())
+        rep.getById(1)
+        print("hello there")
+        applicationContext.cacheDir
         val anime = SampleData.new_anime()
         println(anime)
         println(urlToShiki(anime.image.original))
@@ -52,8 +68,16 @@ class MainActivity : ComponentActivity() {
                         startDestination = "home",
                         modifier = Modifier.padding(contentPadding)
                     ) {
-                        composable("home") { HomeScreen(navController) }
-                        composable("anime") { AnimeScreen(anime = SampleData.new_anime()) }
+                        composable("home") { HomeScreen(navController, rep) }
+                        composable(
+                            route = "anime/{animeId}",
+                            arguments = listOf(navArgument("animeId") { type = NavType.IntType })
+                        ) { backStackEntry ->
+                            AnimeScreen(
+                                animeId = backStackEntry.arguments?.getInt("animeId")!!,
+                                rep = rep
+                            )
+                        }
                         composable("map") { FakeMapScreen() }
                         composable("list") { AnimeList(SampleData.animes()) }
                         composable("settings") { NotImplementedScreen() }
@@ -71,11 +95,11 @@ fun urlToShiki(url: String): String {
 }
 
 
-data class AnimeShort(val name: String, val image: ImageBitmap) {
+data class AnimeShort(val id: Int, val name: String, val image: ImageBitmap) {
     companion object {
         @Composable
-        fun fromResource(name: String, id: Int): AnimeShort {
-            return AnimeShort(name, ImageBitmap.imageResource(id))
+        fun fromResource(animeId: Int, name: String, id: Int): AnimeShort {
+            return AnimeShort(animeId, name, ImageBitmap.imageResource(id))
         }
     }
 }
@@ -125,10 +149,10 @@ object SampleData {
     @Composable
     fun animes(): List<AnimeShort> {
         return listOf(
-            AnimeShort.fromResource("One Piece", R.drawable.one_piece),
-            AnimeShort.fromResource("My hero academy", R.drawable.my_hero_academy),
-            AnimeShort.fromResource("The Angel Next Door Spoils Me Rotten", R.drawable.angel_next_door),
-            AnimeShort.fromResource("Tomo-chan Is a Girl!", R.drawable.tomo_chan_is_a_girl),
+            AnimeShort.fromResource(21, "One Piece", R.drawable.one_piece),
+            AnimeShort.fromResource(31964, "My hero academy", R.drawable.my_hero_academy),
+            AnimeShort.fromResource(50739, "The Angel Next Door Spoils Me Rotten", R.drawable.angel_next_door),
+            AnimeShort.fromResource(52305, "Tomo-chan Is a Girl!", R.drawable.tomo_chan_is_a_girl),
         )
     }
     @SuppressLint("NewApi")
@@ -248,6 +272,6 @@ fun DefaultPreview(content: @Composable() DefaultPreviewContext.() -> Unit) {
 @Composable
 fun BarsPreview() {
     DefaultPreview {
-        HomeScreen(navController = navController)
+//        HomeScreen(navController = navController)
     }
 }
