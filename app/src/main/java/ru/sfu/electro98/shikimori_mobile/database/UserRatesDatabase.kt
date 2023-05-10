@@ -4,30 +4,29 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
-import ru.sfu.electro98.shikimori_mobile.dao.AnimeDatabaseDao
-import ru.sfu.electro98.shikimori_mobile.entities.Anime
+import ru.sfu.electro98.shikimori_mobile.dao.UserRatesDatabaseDao
+import ru.sfu.electro98.shikimori_mobile.entities.UserRate
 
-@TypeConverters(value = [Converters::class])
-@Database(entities = [Anime::class], version = 1)
-abstract class AnimeDatabase: RoomDatabase() {
-    abstract fun animeDao(): AnimeDatabaseDao
+@Database(entities = [UserRate::class], version = 1)
+abstract class UserRatesDatabase: RoomDatabase() {
+    abstract fun userRatesDao(): UserRatesDatabaseDao
+
     companion object {
-        private var INSTANCE: AnimeDatabase? = null
-        fun getInstance(context: Context): AnimeDatabase {
+        private var INSTANCE: UserRatesDatabase? = null
+        fun getInstance(context: Context): UserRatesDatabase {
             synchronized(this) {
                 var instance = INSTANCE
                 if (instance == null) {
                     instance = Room.databaseBuilder(
                         context.applicationContext,
-                        AnimeDatabase::class.java,
-                        "anime_database",
+                        UserRatesDatabase::class.java,
+                        "user_rates_database",
                     ).fallbackToDestructiveMigration()
 //                        .allowMainThreadQueries()
                         .build()
 //                    instance = Room.inMemoryDatabaseBuilder(
 //                        context.applicationContext,
-//                        AnimeDatabase::class.java,
+//                        UserRatesDatabase::class.java,
 //                    ).fallbackToDestructiveMigration()
 //                        .allowMainThreadQueries()
 //                        .build()

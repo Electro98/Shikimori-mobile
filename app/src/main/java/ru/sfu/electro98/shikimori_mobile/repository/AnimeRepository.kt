@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import ru.sfu.electro98.shikimori_mobile.dao.AnimeDatabaseDao
 import ru.sfu.electro98.shikimori_mobile.entities.Anime
@@ -44,6 +45,11 @@ class AnimeRepository(private val animeDatabaseDao: AnimeDatabaseDao) {
             foundAnime.postValue(apiResponse)
         }
         return foundAnime
+    }
+
+    fun getByIdFlow(id: Int): Flow<Anime?> {
+        println("I was called")
+        return animeDatabaseDao.getByIdFlow(id)
     }
 
     fun getAnimes(

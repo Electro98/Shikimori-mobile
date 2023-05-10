@@ -90,6 +90,17 @@ data class Anime(
     @get:Ignore
     val episodesTrulyAired: Int
         get() = if (status == AnimeStatus.released) episodes else episodesAired
+
+    fun createUserRate(status: RateStatus): UserRate {
+        return UserRate(
+            id = 0,
+            targetId = id,
+            name = name,
+            russianName = russianName,
+            status = status,
+            rate = 0f,
+        )
+    }
 }
 
 

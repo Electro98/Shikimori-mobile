@@ -1,25 +1,72 @@
 package ru.sfu.electro98.shikimori_mobile
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import ru.sfu.electro98.shikimori_mobile.entities.Anime
+import ru.sfu.electro98.shikimori_mobile.entities.RateStatus
+import ru.sfu.electro98.shikimori_mobile.entities.UserRate
 import ru.sfu.electro98.shikimori_mobile.repository.AnimeRepository
+import ru.sfu.electro98.shikimori_mobile.repository.UserRatesRepository
+
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun ControlStatusButton(anime: Anime, userRate: UserRate?, userRatesRepository: UserRatesRepository) {
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOption: RateStatus? by remember { mutableStateOf(null) }
+    userRate?.let { selectedOption = it.status }
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = {expanded = !expanded},
+    ) {
+        TextField(
+            readOnly = true,
+            value = selectedOption?.let { RateStatus.getName(it) } ?: "Add to list",
+            onValueChange = { },
+//            label = { Text("Label") },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            colors = ExposedDropdownMenuDefaults.textFieldColors()
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            RateStatus.values().forEach { rateStatus ->
+                DropdownMenuItem(
+                    onClick = {
+                        expanded = false
+                        selectedOption = rateStatus
+                        if (userRate != null) {
+                            userRate.status = rateStatus
+                            userRatesRepository.updateUserRate(userRate)
+                        } else {
+                            userRatesRepository.addUserRate(anime.createUserRate(rateStatus))
+                        }
+                    }
+                ){
+                    Text(text = RateStatus.getName(rateStatus))
+                }
+            }
+        }
+    }
+}
 
 
 @Composable
@@ -43,19 +90,29 @@ fun FakeVerticalRating() {
 
 
 @Composable
-fun ShowAnime(anime: Anime) {
-    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
+fun ShowAnime(anime: Anime, userRate: UserRate?, userRatesRepository: UserRatesRepository) {
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 12.dp),
+        color = MaterialTheme.colors.background,
+    ) {
         Column {
             // Anime poster + rating
             Row {
-                Column(modifier = Modifier.padding(horizontal = 12.dp)) {
+                Column {
                     Text(
                         text = anime.name,
                         modifier = Modifier.padding(vertical = 6.dp),
                         fontSize = 24.sp,
                     )
                     AsyncImage(
-                        model = urlToShiki(anime.image.original),
+//                        model = urlToShiki(anime.image.original),
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(urlToShiki(anime.image.original))
+                            .crossfade(true)
+                            .build(),
+                        placeholder = painterResource(id = R.drawable.missing_original),
                         contentDescription = "Anime '${anime.name}' poster",
                         contentScale = ContentScale.FillWidth,
                         modifier = Modifier
@@ -99,13 +156,11 @@ fun ShowAnime(anime: Anime) {
                 }
             }
             // Add to list
-            Header(title = "Add to list")
+            Header(title = "Add to list", paddingValues = PaddingValues(vertical = 4.dp))
+            ControlStatusButton(anime, userRate, userRatesRepository = userRatesRepository)
             // Description
-            Header(title = "Information")
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 12.dp)
-            ) {
+            Header(title = "Information", paddingValues = PaddingValues(vertical = 4.dp))
+            Column {
                 Row(modifier = Modifier.padding(vertical = 4.dp)) {
                     Text(text = "Type: ")
                     Text(text = anime.kind)
@@ -121,13 +176,19 @@ fun ShowAnime(anime: Anime) {
 
 
 @Composable
-fun AnimeScreen(animeId: Int, rep: AnimeRepository) {
-    val foundAnime by rep.getById(animeId).observeAsState()
-    val currentAnime = foundAnime
-    if (currentAnime != null) {
-        ShowAnime(currentAnime)
-    } else {
-        LoadingScreen()
+fun AnimeScreen(animeId: Int, animeRepository: AnimeRepository, userRatesRepository: UserRatesRepository) {
+    val foundAnime by animeRepository.getById(animeId).observeAsState()
+//    val foundAnime by animeRepository.getByIdFlow(animeId).collectAsState(initial = null)
+    val userRate by userRatesRepository.getByAnimeId(animeId).collectAsState(initial = null)
+    SideEffect {
+        Log.d("Composition", "AnimeScreen was composed, UserRate: $userRate, FoundAnime: $foundAnime")
+    }
+    foundAnime.let {
+        if (it != null) {
+            ShowAnime(it, userRate, userRatesRepository)
+        } else {
+            LoadingScreen()
+        }
     }
 }
 
@@ -136,6 +197,6 @@ fun AnimeScreen(animeId: Int, rep: AnimeRepository) {
 @Composable
 fun AnimeScreenPreview() {
     DefaultPreview {
-        ShowAnime(SampleData.new_anime())
+//        ShowAnime(SampleData.new_anime())
     }
 }

@@ -19,7 +19,6 @@ import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
-import androidx.lifecycle.LiveData
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -27,10 +26,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.gson.Gson
-import kotlinx.coroutines.runBlocking
 import ru.sfu.electro98.shikimori_mobile.database.AnimeDatabase
+import ru.sfu.electro98.shikimori_mobile.database.UserRatesDatabase
 import ru.sfu.electro98.shikimori_mobile.entities.Anime
 import ru.sfu.electro98.shikimori_mobile.repository.AnimeRepository
+import ru.sfu.electro98.shikimori_mobile.repository.UserRatesRepository
 import ru.sfu.electro98.shikimori_mobile.ui.theme.ShikimoriMobileTheme
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -49,13 +49,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val rep = AnimeRepository(AnimeDatabase.getInstance(applicationContext).animeDao())
-        rep.getById(1)
-        print("hello there")
-        applicationContext.cacheDir
-        val anime = SampleData.new_anime()
-        println(anime)
-        println(urlToShiki(anime.image.original))
+        val animeRepository = AnimeRepository(AnimeDatabase.getInstance(applicationContext).animeDao())
+        val userRatesRepository = UserRatesRepository(UserRatesDatabase.getInstance(applicationContext).userRatesDao())
         setContent {
             ShikimoriMobileTheme {
                 val navController = rememberNavController()
@@ -68,18 +63,20 @@ class MainActivity : ComponentActivity() {
                         startDestination = "home",
                         modifier = Modifier.padding(contentPadding)
                     ) {
-                        composable("home") { HomeScreen(navController, rep) }
+                        composable("home") { HomeScreen(navController, animeRepository) }
                         composable(
                             route = "anime/{animeId}",
                             arguments = listOf(navArgument("animeId") { type = NavType.IntType })
                         ) { backStackEntry ->
+                            println("Why?")
                             AnimeScreen(
                                 animeId = backStackEntry.arguments?.getInt("animeId")!!,
-                                rep = rep
+                                animeRepository = animeRepository,
+                                userRatesRepository = userRatesRepository,
                             )
                         }
                         composable("map") { FakeMapScreen() }
-                        composable("list") { AnimeList(SampleData.animes()) }
+                        composable("list") { AnimeListScreen(navController, userRatesRepository) }
                         composable("settings") { NotImplementedScreen() }
                         composable("profile") { NotImplementedScreen() }
                     }
