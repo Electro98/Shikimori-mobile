@@ -26,6 +26,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.gson.Gson
+import com.yandex.mapkit.MapKitFactory
 import ru.sfu.electro98.shikimori_mobile.database.AnimeDatabase
 import ru.sfu.electro98.shikimori_mobile.database.UserRatesDatabase
 import ru.sfu.electro98.shikimori_mobile.entities.Anime
@@ -51,6 +52,9 @@ class MainActivity : ComponentActivity() {
 
         val animeRepository = AnimeRepository(AnimeDatabase.getInstance(applicationContext).animeDao())
         val userRatesRepository = UserRatesRepository(UserRatesDatabase.getInstance(applicationContext).userRatesDao())
+
+        MapKitFactory.setApiKey(BuildConfig.YANDEX_MAP_API_KEY)
+        MapKitFactory.initialize(applicationContext)
         setContent {
             ShikimoriMobileTheme {
                 val navController = rememberNavController()
@@ -75,7 +79,7 @@ class MainActivity : ComponentActivity() {
                                 userRatesRepository = userRatesRepository,
                             )
                         }
-                        composable("map") { FakeMapScreen() }
+                        composable("map") { DumbMapScreen() }
                         composable("list") { AnimeListScreen(navController, userRatesRepository) }
                         composable("settings") { NotImplementedScreen() }
                         composable("profile") { NotImplementedScreen() }

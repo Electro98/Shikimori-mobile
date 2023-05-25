@@ -177,8 +177,7 @@ fun ShowAnime(anime: Anime, userRate: UserRate?, userRatesRepository: UserRatesR
 
 @Composable
 fun AnimeScreen(animeId: Int, animeRepository: AnimeRepository, userRatesRepository: UserRatesRepository) {
-    val foundAnime by animeRepository.getById(animeId).observeAsState()
-//    val foundAnime by animeRepository.getByIdFlow(animeId).collectAsState(initial = null)
+    val foundAnime by animeRepository.getById(animeId).collectAsState(initial = null)
     val userRate by userRatesRepository.getByAnimeId(animeId).collectAsState(initial = null)
     SideEffect {
         Log.d("Composition", "AnimeScreen was composed, UserRate: $userRate, FoundAnime: $foundAnime")

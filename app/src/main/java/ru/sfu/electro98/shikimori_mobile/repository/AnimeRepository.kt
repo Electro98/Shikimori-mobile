@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import ru.sfu.electro98.shikimori_mobile.dao.AnimeDatabaseDao
 import ru.sfu.electro98.shikimori_mobile.entities.Anime
@@ -29,22 +31,21 @@ class AnimeRepository(private val animeDatabaseDao: AnimeDatabaseDao) {
             animeDatabaseDao.delete(anime)
         }
     }
-    fun getById(id: Int): LiveData<Anime> {
-        val foundAnime = MutableLiveData<Anime>()
-        coroutineScope.launch(Dispatchers.IO) {
+    fun getById(id: Int): Flow<Anime?> {
+//        coroutineScope.launch(Dispatchers.IO) {
+        return flow {
             val anime = animeDatabaseDao.getById(id)
             println("Database $anime")
             if (anime != null) {
-                foundAnime.postValue(anime)
-                return@launch
+                emit(anime)
+                return@flow
             }
             val apiResponse = RestClient().fetchAnimeInfo(id)
             if (apiResponse != null)
                 addAnime(apiResponse)
             println("Api response = $apiResponse")
-            foundAnime.postValue(apiResponse)
-        }
-        return foundAnime
+            emit(apiResponse)
+        }.flowOn(Dispatchers.IO)
     }
 
     fun getByIdFlow(id: Int): Flow<Anime?> {

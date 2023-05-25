@@ -8,7 +8,7 @@ import ru.sfu.electro98.shikimori_mobile.entities.UserRate
 @Dao
 interface UserRatesDatabaseDao {
     @Query("SELECT * from user_rates where id = :id")
-    fun getById(id: Int): UserRate?
+    fun getById(id: Int): Flow<UserRate?>
 
     @Query("SELECT * from user_rates where target_id = :id")
     fun getByAnimeId(id: Int): Flow<UserRate?>

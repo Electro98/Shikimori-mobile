@@ -4,6 +4,10 @@ plugins {
     id "org.jetbrains.kotlin.kapt"
 }
 
+def localPropertiesFile = rootProject.file("local.properties")
+def localProperties = new Properties()
+localProperties.load(new FileInputStream(localPropertiesFile))
+
 android {
     namespace 'ru.sfu.electro98.shikimori_mobile'
     compileSdk 33
@@ -14,6 +18,7 @@ android {
         targetSdk 33
         versionCode 1
         versionName "1.0"
+        buildConfigField("String", "YANDEX_MAP_API_KEY", localProperties["YANDEX_MAP_API_KEY"])
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -88,4 +93,12 @@ dependencies {
     implementation "io.coil-kt:coil-compose:2.3.0"
     //observeAsState()
     implementation "androidx.compose.runtime:runtime-livedata:1.5.0-alpha03"
+
+    // The lite library only contains the map, traffic layer,
+    // LocationManager, and UserLocationLayer and lets you download offline maps (in the paid version only).
+    implementation 'com.yandex.android:maps.mobile:4.3.1-lite'
+    // The full library supplements lite version features with car routing,
+    // bike routing, pedestrian routing, and public transport routing,
+    // search, suggest, geocoding, and panorama display.
+    // implementation 'com.yandex.android:maps.mobile:4.3.1-full'
 }

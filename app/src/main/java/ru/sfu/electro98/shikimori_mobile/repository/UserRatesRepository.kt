@@ -31,13 +31,8 @@ class UserRatesRepository(private val userRatesDatabaseDao: UserRatesDatabaseDao
         }
     }
 
-    fun getById(id: Int): LiveData<UserRate> {
-        val foundUserRate = MutableLiveData<UserRate>()
-        coroutineScope.launch(Dispatchers.IO) {
-            val dbAnswer = userRatesDatabaseDao.getById(id)
-            foundUserRate.postValue(dbAnswer)
-        }
-        return foundUserRate
+    fun getById(id: Int): Flow<UserRate?> {
+        return userRatesDatabaseDao.getById(id)
     }
 
     fun getByAnimeId(animeId: Int): Flow<UserRate?> {
